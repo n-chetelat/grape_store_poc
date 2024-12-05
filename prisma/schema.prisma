@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  name           String
+  email          String    @unique
+  hashedPassword String
+  merchant       Merchant?
+  customer       Customer?
+}
+
+model Merchant {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  user     User      @relation(fields: [userId], references: [id])
+  products Product[]
+}
+
+model Customer {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  user   User    @relation(fields: [userId], references: [id])
+  orders Order[]
+  cart   Cart?
+}
+
+model Product {
+  id         String  @id @default(uuid())
+  name       String
+  quantity   Int     @default(0)
+  price      Float   @default(0.0)
+  published  Boolean @default(false)
+  merchantId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  merchant Merchant   @relation(fields: [merchantId], references: [id])
+  orders   Order[]
+  cartItem CartItem[]
+}
+
+model Order {
+  id         String @id @default(uuid())
+  productId  String
+  customerId String
+  pricePaid  Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  product  Product  @relation(fields: [productId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model Cart {
+  id         String @id @default(uuid())
+  customerId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  customer  Customer   @relation(fields: [customerId], references: [id])
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id        String @id @default(uuid())
+  productId String
+  cartId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+  cart    Cart    @relation(fields: [cartId], references: [id])
+}
