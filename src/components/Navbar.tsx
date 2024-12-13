@@ -1,6 +1,6 @@
 import LogoutButton from "@/components/LogoutButton";
 import { Button } from "@/components/ui/Button";
-import { isLoggedIn } from "@/actions/auth";
+import { isLoggedIn } from "@/queries/auth";
 import Link from "next/link";
 import { ShoppingCart, LucideHome } from "lucide-react";
 

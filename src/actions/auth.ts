@@ -1,6 +1,6 @@
 "use server";
 
-import { createSession, decrypt, deleteSession } from "@/libs/session";
+import { createSession, deleteSession } from "@/libs/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { compareSync } from "bcrypt-ts";
@@ -45,27 +45,4 @@ export async function login(prevState: any, formData: FormData) {
 export async function logout() {
   await deleteSession();
   redirect("/login");
-}
-
-export async function getCurrentUser() {
-  const cookie = (await cookies()).get("session")?.value;
-  const session = await decrypt(cookie);
-
-  if (session?.userId) {
-    const user = await prisma.user.findUnique({
-      where: { id: session?.userId as string },
-    });
-
-    if (user) return user;
-  }
-  return null;
-}
-
-export async function isLoggedIn() {
-  const cookie = (await cookies()).get("session")?.value;
-  const session = await decrypt(cookie);
-
-  console.log("sesion is", session?.userId);
-  if (session?.userId) return true;
-  return false;
 }
