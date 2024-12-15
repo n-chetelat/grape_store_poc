@@ -40,12 +40,14 @@ model Customer {
 }
 
 model Product {
-  id         String  @id @default(uuid())
-  name       String
-  quantity   Int     @default(0)
-  price      Float   @default(0.0)
-  published  Boolean @default(false)
-  merchantId String
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  quantity    Int     @default(0)
+  price       Float   @default(0.0)
+  published   Boolean @default(false)
+  merchantId  String
+  imageUrl    String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
