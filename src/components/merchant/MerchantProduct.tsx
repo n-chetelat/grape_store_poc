@@ -51,7 +51,7 @@ export default function MerchantProduct({ product }: MerchantProductType) {
       <CardFooter>
         <Link
           className="text-sm text-muted-foreground hover:underline"
-          href={`/products/${product.id}`}
+          href={`/merchant/products/${product.id}`}
         >
           See product
         </Link>
