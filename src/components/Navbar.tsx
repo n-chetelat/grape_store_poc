@@ -21,7 +21,7 @@ export default async function Navbar() {
             </Link>
           </Button>
           <Button asChild variant="link">
-            <Link href="/products">Orders</Link>
+            <Link href="/customer/purchases">Orders</Link>
           </Button>
           {"|"}
           <Button asChild variant="link">

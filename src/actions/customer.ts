@@ -1,11 +1,18 @@
+"use server";
+
 import prisma from "@/libs/prisma";
 import { getCurrentUser } from "@/queries/auth";
+import { redirect } from "next/navigation";
 
-export async function addToCart(productId: string) {
+export async function addToCart(prevState: any, formData: FormData) {
+  const productId = formData.get("productId");
+
   const user = await getCurrentUser();
 
   if (!user || !user.customer) {
-    throw Error("No customer is currently logged in");
+    return {
+      error: "No customer is currently logged in",
+    };
   }
 
   try {
@@ -20,15 +27,19 @@ export async function addToCart(productId: string) {
     }
 
     const cartItem = await prisma.cartItem.create({
-      data: { cartId: cart.id, productId },
+      data: { cartId: cart.id, productId: productId as string },
     });
 
     if (!cartItem) {
-      throw Error(`Could not add item to card: ID ${productId}.`);
+      return {
+        error: `Could not add item to card: ID ${productId}.`,
+      };
     }
-
-    return !!cartItem;
   } catch (error) {
-    throw Error("There was a problem while adding an item to customer's cart");
+    return {
+      error: "There was a problem while adding an item to customer's cart",
+    };
   }
+
+  redirect("/cart");
 }

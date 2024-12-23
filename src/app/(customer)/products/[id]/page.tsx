@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/Button";
 import { TypographyH1 } from "@/components/ui/TypographyH1";
 import { getProduct } from "@/queries/product";
 import { CircleCheck } from "lucide-react";
 import Image from "next/image";
+import CartButton from "@/components/customer/CartButton";
 
 export default async function ProductPage({
   params,
@@ -11,21 +11,6 @@ export default async function ProductPage({
 }) {
   const id = (await params).id;
   const product = await getProduct(id);
-
-  // const handleAddToCart = async (e: React.SyntheticEvent) => {
-  //   // On add to cart:
-  //   // - Create a cart if none exists
-  //   // - Add product to cart
-  //   // - Redirect to cart page
-  //   // - Show badge on cart icon
-  //   e.preventDefault();
-  //   try {
-  //     const added = await addToCart(id);
-  //     if (!added) {
-
-  //     }
-  //   } catch (error) {}
-  // };
 
   return (
     <>
@@ -52,7 +37,7 @@ export default async function ProductPage({
               <p>{product.description}</p>
             </div>
 
-            <Button type="submit">Add to Cart</Button>
+            <CartButton product={product} />
           </div>
         </div>
       ) : (
