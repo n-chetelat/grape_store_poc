@@ -1,10 +1,14 @@
 import prisma from "@/libs/prisma";
 
 export async function getProducts() {
-  const products = await prisma.product.findMany({
+  return await prisma.product.findMany({
     where: { published: true, quantity: { gt: 0 } },
     take: 10,
   });
+}
 
-  return products;
+export async function getProduct(id: string) {
+  return await prisma.product.findUnique({
+    where: { id },
+  });
 }

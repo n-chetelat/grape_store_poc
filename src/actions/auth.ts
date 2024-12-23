@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { compareSync } from "bcrypt-ts";
 import prisma from "@/libs/prisma";
-import { cookies } from "next/headers";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }).trim(),
