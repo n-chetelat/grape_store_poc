@@ -52,22 +52,33 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  merchant Merchant   @relation(fields: [merchantId], references: [id])
-  orders   Order[]
-  cartItem CartItem[]
+  merchant   Merchant    @relation(fields: [merchantId], references: [id])
+  orderItems OrderItem[]
+  cartItem   CartItem[]
 }
 
 model Order {
   id         String @id @default(uuid())
-  productId  String
   customerId String
-  pricePaid  Float
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  product  Product  @relation(fields: [productId], references: [id])
-  customer Customer @relation(fields: [customerId], references: [id])
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  pricePaid Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model Cart {
@@ -77,8 +88,8 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  customer  Customer   @relation(fields: [customerId], references: [id])
-  cartItems CartItem[]
+  customer Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  CartItem CartItem[]
 }
 
 model CartItem {
@@ -90,5 +101,5 @@ model CartItem {
   updatedAt DateTime @default(now()) @updatedAt
 
   product Product @relation(fields: [productId], references: [id])
-  cart    Cart    @relation(fields: [cartId], references: [id])
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
 }
