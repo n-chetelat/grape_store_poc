@@ -86,8 +86,8 @@ export async function getOrderItems() {
     };
   }
 
-  const order = await prisma.order.create({
-    data: { customerId },
+  const order = await prisma.order.findFirst({
+    where: { customerId },
     select: { orderItems: { include: { product: true } } },
   });
 

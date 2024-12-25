@@ -89,7 +89,6 @@ function Form({ total }: { total: number }) {
         </CardHeader>
         <CardContent>
           <PaymentElement />
-          <LinkAuthenticationElement />
         </CardContent>
         <CardFooter>
           <Button

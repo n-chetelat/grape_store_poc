@@ -35,12 +35,14 @@ export default async function CheckoutSuccessPage({
       <TypographyH1>
         {isSuccess ? "Order complete!" : "Order error"}
       </TypographyH1>
-      {orderItems?.data?.length &&
-        orderItems.data.map((oi) => (
-          <li>
-            <p>{oi.product.name}</p>
-          </li>
-        ))}
+      <p>{JSON.stringify(orderItems)}</p>
+      {orderItems?.data?.length
+        ? orderItems.data.map((oi) => (
+            <li>
+              <p>{oi.product.name}</p>
+            </li>
+          ))
+        : "No order items to display"}
     </div>
   );
 }

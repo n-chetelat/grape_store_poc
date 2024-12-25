@@ -1,5 +1,14 @@
 import { inngest } from "@/libs/inngest";
-import prisma from "@/libs/prisma";
+
+type EventData = {
+  stripeEvent: any;
+};
+
+export const HANDLED_EVENTS = [
+  "payment_intent.succeeded",
+  "payment_intent.processing",
+  "payment_intent.payment_failed",
+];
 
 export const handleStripeEvent = inngest.createFunction(
   { id: "stripe-handler" },
@@ -9,40 +18,26 @@ export const handleStripeEvent = inngest.createFunction(
     switch (eventData.stripeEvent.type) {
       case "payment_intent.succeeded":
       case "payment_intent.processing":
-      case "payment_intent.payment_failed":
         handlePaymentIntentEvent(eventData);
         break;
-        //   case "account.application.authorized":
-        // handle
+      case "payment_intent.payment_failed":
+        handlePaymentIntentError(eventData);
         break;
       default:
-        console.log(`Unhandled event type ${eventData.stripeEvent.type}`); // Don't do that only. Return something informative.
+        console.log(`Unhandled event type ${eventData.stripeEvent.type}`);
     }
     return { event };
   }
 );
 
-async function handlePaymentIntentEvent(eventData: EventData) {
-  //   try {
-  //     const account = eventData.stripeEvent.data.object;
-  //     await prisma.stripeAccount.update({
-  //       where: {
-  //         stripeAccountId: account?.id,
-  //       },
-  //       data: {
-  //         chargesEnabled: account.charges_enabled,
-  //         payoutsEnabled: account.payouts_enabled,
-  //         onboardingComplete: account.details_submitted,
-  //       },
-  //     });
-  //     console.log(
-  //       `Successfully handled stripe event "${eventData.stripeEvent.type}"`
-  //     );
-  //   } catch (error) {
-  //     console.log(error); // Don't do that only. Return something informative.
-  //   }
+function handlePaymentIntentEvent(eventData: EventData) {
+  console.log(
+    `Successfully handled stripe event of type "${eventData.stripeEvent.type}"`
+  );
 }
 
-type EventData = {
-  stripeEvent: any;
-};
+function handlePaymentIntentError(eventData: EventData) {
+  console.log(
+    `Could not handle stripe event of type "${eventData.stripeEvent.type}"`
+  );
+}
