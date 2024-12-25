@@ -28,3 +28,15 @@ export async function isLoggedIn() {
   if (session?.userId) return true;
   return false;
 }
+
+export async function getCurrentMerchantId() {
+  const user = await getCurrentUser();
+  if (!user || !user?.merchant?.id) return null;
+  return user.merchant.id;
+}
+
+export async function getCurrentCustomerId() {
+  const user = await getCurrentUser();
+  if (!user || !user?.customer?.id) return null;
+  return user.customer.id;
+}

@@ -15,49 +15,60 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 export default async function CartPage() {
   const cart = await getCart();
   const cartItems = await getCartItems();
-  const total = cartItems
-    .map((ci) => ci.product.price)
-    .reduce((sum, total) => sum + total, 0);
+  let total = 0;
+  let paymentIntent;
 
-  const totalInCents = Math.floor(total * 100);
+  if (cartItems.length !== 0) {
+    total = cartItems
+      .map((ci) => ci.product.price)
+      .reduce((sum, total) => sum + total, 0);
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: totalInCents,
-    currency: "CAD",
-    metadata: {
-      cartId: cart?.id || null,
-    },
-  });
+    const totalInCents = Math.floor(total * 100);
 
-  if (paymentIntent.client_secret === null) {
-    throw Error("Error while creating payment intent");
+    paymentIntent = await stripe.paymentIntents.create({
+      amount: totalInCents,
+      currency: "CAD",
+      metadata: {
+        cartId: cart?.id || null,
+      },
+    });
+
+    if (paymentIntent.client_secret === null) {
+      throw Error("Error while creating payment intent");
+    }
   }
 
   return (
-    <div className="flex">
-      <Card className="flex-1">
-        <CardHeader>
-          <CardTitle>Your items:</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="flex flex-col gap-4 p-4 full-w">
-            {cartItems.map((item) => (
-              <li key={item.id}>
-                <CartItemCard product={item.product} />
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <p className="font-bold text-2xl">Total: ${total}</p>
-        </CardFooter>
-      </Card>
-      <div className="flex-1">
-        <CheckoutForm
-          clientSecret={paymentIntent.client_secret}
-          total={total}
-        />
-      </div>
+    <div>
+      {cartItems.length && paymentIntent ? (
+        <div className="flex">
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Your items:</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="flex flex-col gap-4 p-4 full-w">
+                {cartItems.map((item) => (
+                  <li key={item.id}>
+                    <CartItemCard product={item.product} />
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter className="flex justify-end">
+              <p className="font-bold text-2xl">Total: ${total}</p>
+            </CardFooter>
+          </Card>
+          <div className="flex-1">
+            <CheckoutForm
+              clientSecret={paymentIntent.client_secret as string}
+              total={total}
+            />
+          </div>
+        </div>
+      ) : (
+        "No items currently in your cart"
+      )}
     </div>
   );
 }

@@ -1,12 +1,13 @@
-import { createOrder, getOrderItems } from "@/actions/customer";
+import { createOrder } from "@/actions/customer";
+import { getOrderItems } from "@/queries/orders";
 import { TypographyH1 } from "@/components/ui/TypographyH1";
 import { getCart } from "@/queries/cart";
-import { OrderItemWithProduct } from "@/libs/types";
+import { OrderItemWithProduct, Order } from "@/libs/types";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-export default async function CheckoutSuccessPage({
+export default async function CheckoutdataPage({
   searchParams,
 }: {
   searchParams: Promise<{
@@ -16,29 +17,27 @@ export default async function CheckoutSuccessPage({
   const cart = await getCart();
   const paymentIntentId = (await searchParams).payment_intent;
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-  const isSuccess = paymentIntent.status === "succeeded";
+  const isdata = paymentIntent.status === "succeeded";
 
-  let orderCreated: { error: string | null; success: boolean };
+  let order: { error: string | null; data: Order | null };
   let orderItems: {
     error: string | null;
     data: OrderItemWithProduct[] | null;
   } = { error: null, data: null };
   if (cart?.id && paymentIntent.metadata.cartId === cart.id) {
-    orderCreated = await createOrder();
-    if (orderCreated.success) {
-      orderItems = await getOrderItems();
+    order = await createOrder(paymentIntent.id);
+    if (order.data) {
+      orderItems = await getOrderItems(order.data.id);
     }
   }
 
   return (
     <div>
-      <TypographyH1>
-        {isSuccess ? "Order complete!" : "Order error"}
-      </TypographyH1>
+      <TypographyH1>{isdata ? "Order complete!" : "Order error"}</TypographyH1>
       <p>{JSON.stringify(orderItems)}</p>
       {orderItems?.data?.length
         ? orderItems.data.map((oi) => (
-            <li>
+            <li key={oi.id}>
               <p>{oi.product.name}</p>
             </li>
           ))

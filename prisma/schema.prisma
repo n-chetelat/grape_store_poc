@@ -58,8 +58,9 @@ model Product {
 }
 
 model Order {
-  id         String @id @default(uuid())
-  customerId String
+  id              String @id @default(uuid())
+  customerId      String
+  paymentIntentId String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

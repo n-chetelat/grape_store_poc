@@ -1,5 +1,10 @@
-import { type CartItem, type Product, type OrderItem } from "@prisma/client";
-export { type Product } from "@prisma/client";
+import {
+  type CartItem,
+  type Product,
+  type OrderItem,
+  Order,
+} from "@prisma/client";
+export { type Product, type Order } from "@prisma/client";
 
 export type CartItemWithProduct = CartItem & {
   product: Product;
@@ -7,4 +12,10 @@ export type CartItemWithProduct = CartItem & {
 
 export type OrderItemWithProduct = OrderItem & {
   product: Product;
+};
+
+export type OrderWithItemWithProduct = Order & {
+  orderItems: (OrderItem & {
+    product: Product;
+  })[];
 };

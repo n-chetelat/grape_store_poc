@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/libs/prisma";
-import { getCurrentUser } from "@/queries/auth";
+import { getCurrentCustomerId, getCurrentUser } from "@/queries/auth";
 import { getCartItems } from "@/queries/cart";
 import { redirect } from "next/navigation";
 
@@ -45,17 +45,17 @@ export async function addToCart(prevState: any, formData: FormData) {
   redirect("/cart");
 }
 
-export async function createOrder() {
-  const customerId = (await getCurrentUser())?.customer?.id;
+export async function createOrder(paymentIntentId: string) {
+  const customerId = await getCurrentCustomerId();
   if (!customerId) {
     return {
       error: "No customer is currently logged in",
-      success: false,
+      data: null,
     };
   }
 
   const order = await prisma.order.create({
-    data: { customerId },
+    data: { customerId, paymentIntentId },
   });
 
   const cartItems = await getCartItems();
@@ -74,25 +74,5 @@ export async function createOrder() {
     where: { id: cartItems[0].cartId },
   });
 
-  return { error: null, success: true };
-}
-
-export async function getOrderItems() {
-  const customerId = (await getCurrentUser())?.customer?.id;
-  if (!customerId) {
-    return {
-      error: "No customer is currently logged in",
-      data: null,
-    };
-  }
-
-  const order = await prisma.order.findFirst({
-    where: { customerId },
-    select: { orderItems: { include: { product: true } } },
-  });
-
-  return {
-    error: null,
-    data: order?.orderItems || [],
-  };
+  return { error: null, data: order };
 }
