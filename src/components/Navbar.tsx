@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/Button";
 import { isLoggedIn, getCurrentMerchantId } from "@/queries/auth";
 import Link from "next/link";
 import { ShoppingCart, LucideHome } from "lucide-react";
+import { getCartItemCount } from "@/queries/cart";
 
 export default async function Navbar() {
   const loggedIn = await isLoggedIn();
   const isMerchant = !!(await getCurrentMerchantId());
+  const itemCount = await getCartItemCount();
 
   return (
     <nav className="flex flex-row justify-end">
@@ -17,9 +19,14 @@ export default async function Navbar() {
               <LucideHome />
             </Link>
           </Button>
-          <Button asChild variant="link" size="icon">
+          <Button asChild variant="link" size="icon" className="relative">
             <Link href="/cart">
               <ShoppingCart />
+              {itemCount > 0 && (
+                <span className="absolute top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  {itemCount}
+                </span>
+              )}
             </Link>
           </Button>
           <Button asChild variant="link">

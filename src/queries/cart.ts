@@ -1,36 +1,39 @@
 import prisma from "@/libs/prisma";
-import { getCurrentUser } from "./auth";
-import { CartItemWithProduct } from "@/libs/types";
+import { getCurrentCustomerId } from "@/queries/auth";
 
 export async function getCart() {
-  const user = await getCurrentUser();
-  if (!user || !user.customer?.id) {
+  const customerId = await getCurrentCustomerId();
+  if (!customerId) {
     throw Error("No customer is currently logged in");
   }
 
   const cart = await prisma.cart.findUnique({
-    where: { customerId: user?.customer.id },
+    where: { customerId },
   });
 
   return cart;
 }
 
 export async function getCartItems() {
-  const cart = await getCart();
+  const customerId = await getCurrentCustomerId();
+  if (!customerId) return [];
 
-  let cartItems: CartItemWithProduct[] = [];
-  if (cart) {
-    cartItems = await prisma.cartItem.findMany({
-      where: { cartId: cart.id },
-      include: {
-        product: true,
-      },
-    });
+  const cart = await prisma.cart.findUnique({
+    where: { customerId },
+    include: { cartItems: { include: { product: true } } },
+  });
 
-    if (cartItems?.length > 0) {
-      return cartItems;
-    }
-  }
+  return cart?.cartItems || [];
+}
 
-  return [];
+export async function getCartItemCount() {
+  const customerId = await getCurrentCustomerId();
+  if (!customerId) return 0;
+
+  const cart = await prisma.cart.findUnique({
+    where: { customerId },
+    include: { _count: { select: { cartItems: true } } },
+  });
+
+  return cart?._count.cartItems || 0;
 }

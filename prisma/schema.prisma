@@ -83,8 +83,8 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  customer Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  CartItem CartItem[]
+  customer  Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  cartItems CartItem[]
 }
 
 model CartItem {
