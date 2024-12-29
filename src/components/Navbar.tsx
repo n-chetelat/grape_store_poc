@@ -1,11 +1,13 @@
 import LogoutButton from "@/components/LogoutButton";
 import { Button } from "@/components/ui/Button";
-import { isLoggedIn } from "@/queries/auth";
+import { isLoggedIn, getCurrentMerchantId } from "@/queries/auth";
 import Link from "next/link";
 import { ShoppingCart, LucideHome } from "lucide-react";
 
 export default async function Navbar() {
   const loggedIn = await isLoggedIn();
+  const isMerchant = !!(await getCurrentMerchantId());
+
   return (
     <nav className="flex flex-row justify-end">
       {loggedIn ? (
@@ -24,9 +26,11 @@ export default async function Navbar() {
             <Link href="/customer/purchases">Orders</Link>
           </Button>
           {"|"}
-          <Button asChild variant="link">
-            <Link href="/merchant">My Store</Link>
-          </Button>
+          {isMerchant && (
+            <Button asChild variant="link">
+              <Link href="/merchant">My Store</Link>
+            </Button>
+          )}
           <LogoutButton />
         </div>
       ) : (
