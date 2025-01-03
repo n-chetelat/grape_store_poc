@@ -24,7 +24,6 @@ export async function isLoggedIn() {
   const cookie = (await cookies()).get("session")?.value;
   const session = await decrypt(cookie);
 
-  console.log("sesion is", session?.userId);
   if (session?.userId) return true;
   return false;
 }
