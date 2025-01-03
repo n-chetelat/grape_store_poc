@@ -20,7 +20,7 @@ model Merchant {
   id     String @id @default(uuid())
   userId String @unique
 
-  user     User      @relation(fields: [userId], references: [id])
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   products Product[]
 }
 
@@ -28,7 +28,7 @@ model Customer {
   id     String @id @default(uuid())
   userId String @unique
 
-  user   User    @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
   cart   Cart?
 }
@@ -46,7 +46,7 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  merchant   Merchant    @relation(fields: [merchantId], references: [id])
+  merchant   Merchant    @relation(fields: [merchantId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
   cartItem   CartItem[]
 }
